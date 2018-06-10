@@ -81,7 +81,7 @@
     <Compile Include="Converters\BoolToMark.cs" />
     <Compile Include="Models\Cod4BrowseServer.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="Student.cs" />
+    <Compile Include="Util\Util.cs" />
     <Page Include="Controls\BindableDocument.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

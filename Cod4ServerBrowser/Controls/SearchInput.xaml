@@ -18,6 +18,6 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <materialIcons:MaterialIcon Visibility="{Binding ShowSearchIcon, Converter={StaticResource VisibilityConverter}}" Icon="ic_search"/>
-        <TextBox FontSize="15" Grid.Column="1" Controls:TextBoxHelper.Watermark="{Binding WaterMark}"/>
+        <TextBox x:Name="SearchBox"  FontSize="15" Grid.Column="1" Controls:TextBoxHelper.Watermark="{Binding WaterMark}"/>
     </Grid>
 </UserControl>

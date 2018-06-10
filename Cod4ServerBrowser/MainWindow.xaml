@@ -9,9 +9,8 @@
         xmlns:UI="clr-namespace:Cod4ServerBrowser.Controls"
         xmlns:converters="clr-namespace:Cod4ServerBrowser.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="528.252" Width="851.837">
+        Title="Server Browser" Height="528.252" Width="851.837">
     <Window.Resources>
-        <CollectionViewSource x:Key="ItemCollectionViewSource" Source="{Binding ItemList}"  CollectionViewType="ListCollectionView"/>
         <converters:BoolToMarkConverter x:Key="BoolToMarkConverter" />
         <converters:Q3TextToDocument x:Key="Q3TextToDocumentConverter" />
     </Window.Resources>
@@ -23,21 +22,39 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <UI:SearchInput WaterMark="Search Server" ShowSearchIcon="True"/>
+        <UI:SearchInput x:Name="ServerSearch" WaterMark="Search Server" ShowSearchIcon="True"/>
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
         </StackPanel>
-        <UI:SearchInput Grid.Row="0" Grid.Column="2" WaterMark="Search Player"/>
-        <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal">
-            <Label x:Name="ServersCount" Content="{Binding Servers.Count}" ContentStringFormat="Servers: {0}"/>
-        </StackPanel>
-        <DataGrid x:Name="DataGrid" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" ItemsSource="{Binding Servers}" AutoGenerateColumns="False" IsReadOnly="True">
+        <UI:SearchInput x:Name="PlayerSearch" Grid.Row="0" Grid.Column="2" WaterMark="Search Player"/>
+        <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <Viewbox Width="40">
+                    <materialIcons:MaterialIcon Icon="ic_dns"/>
+                </Viewbox>
+                <Label Content="{Binding Servers.Count}" ContentStringFormat="Servers: {0}" VerticalAlignment="Center"/>
+                <Viewbox Width="40">
+                    <materialIcons:MaterialIcon Icon="ic_people"/>
+                </Viewbox>
+                <Label Content="{Binding PlayerCount}" ContentStringFormat="Players: {0}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <Button x:Name="QuickRefresh" Grid.Column="1" Content="Quick Refresh" Margin="5,5,5,5"/>
+            <Button x:Name="FullRefresh" Grid.Column="2" Content="Refresh" Margin="5,5,5,5"/>
+        </Grid>
+        <DataGrid x:Name="DataGrid" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" ItemsSource="{Binding Servers, Mode=TwoWay}" AutoGenerateColumns="False" IsReadOnly="True">
             <DataGrid.Columns>
-
-                <DataGridTextColumn Binding="{Binding IsPasswordProtected, Converter={StaticResource BoolToMarkConverter}}">
+                <DataGridTextColumn Binding="{Binding IsPasswordProtected, Converter={StaticResource BoolToMarkConverter}}"  SortMemberPath="IsPasswordProtected">
                     <DataGridTextColumn.HeaderTemplate>
                         <DataTemplate>
                             <materialIcons:MaterialIcon Icon="ic_lock" Width="20"/>
@@ -57,15 +74,14 @@
                         </Style>
                     </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
-
-                <DataGridTemplateColumn Header="HostName" Width="2*" SortMemberPath="HostName">
+                <!--<DataGridTemplateColumn Header="HostName" Width="2*" SortMemberPath="HostName">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <UI:BindableDocument Text="{Binding Path=HostName}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <!--<DataGridTextColumn Header="HostName" Binding="{Binding HostName}" Width="2*"/>-->
+                </DataGridTemplateColumn>-->
+                <DataGridTextColumn Header="HostName" Binding="{Binding HostName}" Width="2*"/>
                 <DataGridTextColumn Header="Map" Binding="{Binding MapName}" Width="1*"/>
                 <DataGridTemplateColumn Header="Players" Width="*" SortMemberPath="OnlinePlayers">
                     <DataGridTemplateColumn.CellTemplate>
@@ -73,7 +89,7 @@
                             <StackPanel>
                                 <TextBlock HorizontalAlignment="Center">
                                     <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}{0}/{1}">
+                                        <MultiBinding StringFormat=" {0}/{1}">
                                             <Binding Path="OnlinePlayers" />
                                             <Binding Path="MaxPlayers" />
                                         </MultiBinding>
