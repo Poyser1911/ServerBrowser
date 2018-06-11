@@ -8,6 +8,7 @@ namespace Cod4ServerBrowser.Models
     {
         public bool IsPasswordProtected { get; set; }
         public string HostName { get; set; }
+        public string Connect { get; set; }
         public string HostNameClean { get; set; }
         public string MapName { get; set; }
         public int MaxPlayers { get; set; }

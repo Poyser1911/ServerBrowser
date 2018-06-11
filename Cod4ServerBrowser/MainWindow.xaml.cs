@@ -17,6 +17,7 @@ using Cod4.Core.Models;
 using Cod4.Core.Parse;
 using Cod4ServerBrowser.Models;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Cod4ServerBrowser
 {
@@ -68,6 +69,24 @@ namespace Cod4ServerBrowser
             PlayerSearch.SearchBox.TextChanged += (s, e) => SearchHelper.Filter = new Predicate<object>(item => ((Cod4BrowseServer)item).Players.Any(p => p.name.ToLower().Contains(PlayerSearch.SearchBox.Text.ToLower())));
             QuickRefresh.Click += (s, e) => GetStatus(ServerIpCache);
             FullRefresh.Click += (s, e) => RefreshServers();
+            DataGrid.MouseDoubleClick += DataGrid_MouseDoubleClick;
+        }
+
+        private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (DataGrid.SelectedIndex < 0) return;
+            string connect = (DataGrid.SelectedItem as Cod4BrowseServer).Connect;
+            Task.Run(() =>
+            {
+                var Processes = Process.GetProcesses();
+                Process game = Process.GetProcesses().FirstOrDefault(p => p.ProcessName == "iw3mp");
+                if (game != null)
+                {
+                    game.Kill();
+                    if (!game.WaitForExit(5000)) return;
+                }
+                Process.Start($"cod4://{connect}");
+            });
         }
 
         private void RefreshServers() => _master.GetServers();
@@ -134,6 +153,7 @@ namespace Cod4ServerBrowser
                             {
                                 IsPasswordProtected = result.Dvars.GetVal("pswrd") == "1",
                                 HostName = Util.RemoveColours(result.Dvars.GetVal("sv_hostname")),
+                                Connect = $"{source.IP}:{source.Port}",
                                 HostNameClean = Util.RemoveColours(result.Dvars.GetVal("sv_hostname")),
                                 MapName = Util.FriendlyMapName(result.Dvars.GetVal("mapname")),
                                 Players = result.Players,
