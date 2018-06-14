@@ -1,2 +1,2 @@
 # ServerBrowser
-![Alt text](relative/screenshot.png?raw=true "Screenshot")
+![ScreenShot](https://github.com/Poyser1911/ServerBrowser/blob/master/screenshot.png)
