@@ -18,6 +18,7 @@ using Cod4.Core.Parse;
 using Cod4ServerBrowser.Models;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
 
 namespace Cod4ServerBrowser
 {
@@ -127,8 +128,7 @@ namespace Cod4ServerBrowser
                         {
                             data = _udp.Receive(ref sender);
                             // Console.WriteLine($"Packet #{count++} Received with [{data.Length} bytes] from { sender.Address}");
-
-                            LogServer(new Source() { IP = sender.Address.ToString(), Port = sender.Port, Status = Encoding.Default.GetString(data) }, true, true);
+                            LogServer(new Source() { IP = sender.Address.ToString(), Port = sender.Port, Status = Encoding.Default.GetString(data) }, _udp.Ttl, true, true);
                         }
                         catch (Exception) { }
                     }
@@ -138,7 +138,19 @@ namespace Cod4ServerBrowser
             });
         }
 
-        public void LogServer(Source source, bool getdvars = true, bool getplayers = true)
+        public long GetPing(Source server)
+        {
+            try
+            {
+                PingReply reply = new Ping().Send(server.IP, 5000);
+                if (reply != null) return reply.RoundtripTime;
+            }
+            catch { }
+
+            return 1;
+        }
+
+        public void LogServer(Source source, short ttl, bool getdvars = true, bool getplayers = true)
         {
             Task.Run(() =>
             {
@@ -147,6 +159,7 @@ namespace Cod4ServerBrowser
                 {
                     if (Parser.GetServerInfo(source, getdvars, getplayers, out result))
                     {
+                        long ping = -1;
                         Dispatcher.Invoke(() =>
                         {
                             Servers.Add(new Cod4BrowseServer
@@ -162,6 +175,7 @@ namespace Cod4ServerBrowser
                                 GameType = Util.FriendlyGametype(result.Dvars.GetVal("g_gametype")),
                                 Voice = result.Dvars.GetVal("sv_voice") == "1",
                                 PunkBuster = result.Dvars.GetVal("sv_punkbuster") == "1",
+                                Ping = ping
                             });
                             PlayerCount += result.Players.Count;
 

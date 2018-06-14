@@ -8,12 +8,12 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Cod4ServerBrowser")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Cod4 Server Browser")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Cod4ServerBrowser")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("Poyser")]
+[assembly: AssemblyProduct("Cod4ServerBrowser by Poyser")]
+[assembly: AssemblyCopyright("Copyright © Poyser  2018")]
+[assembly: AssemblyTrademark("Poyser")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible

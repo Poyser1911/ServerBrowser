@@ -17,5 +17,6 @@ namespace Cod4ServerBrowser.Models
         public string GameType { get; set; }
         public bool Voice { get; set; }
         public bool PunkBuster { get; set; }
+        public long Ping { get; set; }
     }
 }

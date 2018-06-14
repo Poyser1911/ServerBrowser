@@ -9,7 +9,7 @@
         xmlns:UI="clr-namespace:Cod4ServerBrowser.Controls"
         xmlns:converters="clr-namespace:Cod4ServerBrowser.Converters"
         mc:Ignorable="d"
-        Title="Server Browser" Height="528.252" Width="851.837">
+        Title="Server Browser by Poyser" Height="528.252" Width="851.837">
     <Window.Resources>
         <converters:BoolToMarkConverter x:Key="BoolToMarkConverter" />
         <converters:Q3TextToDocument x:Key="Q3TextToDocumentConverter" />
@@ -82,6 +82,13 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>-->
                 <DataGridTextColumn Header="HostName" Binding="{Binding HostName}" Width="2*"/>
+                <DataGridTextColumn Header="Connect" Binding="{Binding Connect}" Width="1.5*">
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MetroDataGridCell}">
+                            <Setter Property="Margin" Value="15,0,0,0"/>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="Map" Binding="{Binding MapName}" Width="1*"/>
                 <DataGridTemplateColumn Header="Players" Width="*" SortMemberPath="OnlinePlayers">
                     <DataGridTemplateColumn.CellTemplate>
