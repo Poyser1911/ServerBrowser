@@ -1,2 +1,2 @@
 # ServerBrowser
-![ScreenShot](https://github.com/Poyser1911/ServerBrowser/blob/master/screenshot.png)
+![ScreenShot](https://github.com/Poyser1911/ServerBrowser/blob/master/screenshot1.png)
