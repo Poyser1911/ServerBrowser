@@ -53,6 +53,18 @@
             <Button x:Name="FullRefresh" Grid.Column="2" Content="Refresh" Margin="5,5,5,5"/>
         </Grid>
         <DataGrid x:Name="DataGrid" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" ItemsSource="{Binding Servers, Mode=TwoWay}" AutoGenerateColumns="False" IsReadOnly="True">
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <DataGrid ItemsSource="{Binding Players}" AutoGenerateColumns="False" IsReadOnly="True" Width="{Binding ActualWidth, ElementName=DataGrid}" Padding="40,0,40,0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding name}" Width="*"/>
+                            <DataGridTextColumn Header="Ping" Binding="{Binding ping}" Width="*"/>
+                            <DataGridTextColumn Header="Rank" Binding="{Binding rank}" Width="*"/>
+                            <DataGridTextColumn Header="Score" Binding="{Binding score}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding IsPasswordProtected, Converter={StaticResource BoolToMarkConverter}}"  SortMemberPath="IsPasswordProtected">
                     <DataGridTextColumn.HeaderTemplate>

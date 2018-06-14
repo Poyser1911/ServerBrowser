@@ -19,6 +19,7 @@ using Cod4ServerBrowser.Models;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
+using System.Windows.Input;
 
 namespace Cod4ServerBrowser
 {
@@ -29,9 +30,9 @@ namespace Cod4ServerBrowser
     {
         private UdpClient _udp;
         private Cod4MasterQuery _master;
-        private List<Server> ServerIpCache = new List<Server>();
+        private List<Server> _serverIpCache = new List<Server>();
         public static ObservableCollection<Cod4BrowseServer> Servers { get; set; } = new ObservableCollection<Cod4BrowseServer>();
-        public int PlayerCount { get; private set; } = 0;
+        public int PlayerCount { get; private set; }
         private ICollectionView SearchHelper { get; set; } = CollectionViewSource.GetDefaultView(Servers);
         public event PropertyChangedEventHandler PropertyChanged;
         public MainWindow()
@@ -66,20 +67,38 @@ namespace Cod4ServerBrowser
 
         private void InitUIEventHandlers()
         {
-            ServerSearch.SearchBox.TextChanged += (s, e) => SearchHelper.Filter = new Predicate<object>(item => ((Cod4BrowseServer)item).HostName.ToLower().Contains(ServerSearch.SearchBox.Text.ToLower()));
-            PlayerSearch.SearchBox.TextChanged += (s, e) => SearchHelper.Filter = new Predicate<object>(item => ((Cod4BrowseServer)item).Players.Any(p => p.name.ToLower().Contains(PlayerSearch.SearchBox.Text.ToLower())));
-            QuickRefresh.Click += (s, e) => GetStatus(ServerIpCache);
+            ServerSearch.SearchBox.TextChanged += (s, e) => SearchHelper.Filter = item => ((Cod4BrowseServer)item).HostName.ToLower().Contains(ServerSearch.SearchBox.Text.ToLower());
+            PlayerSearch.SearchBox.TextChanged += (s, e) => SearchHelper.Filter = item => ((Cod4BrowseServer)item).Players.Any(p => p.name.ToLower().Contains(PlayerSearch.SearchBox.Text.ToLower()));
+            QuickRefresh.Click += (s, e) => GetStatus(_serverIpCache);
             FullRefresh.Click += (s, e) => RefreshServers();
             DataGrid.MouseDoubleClick += DataGrid_MouseDoubleClick;
+            DataGrid.PreviewMouseDown += DataGrid_PreviewMouseDown;
         }
 
-        private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void DataGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is DataGrid grid)
+            {
+                FrameworkElement element = e.OriginalSource as FrameworkElement;
+
+                if (element?.DataContext is Cod4BrowseServer)
+                {
+                    if (grid.SelectedItem == (Cod4BrowseServer)((FrameworkElement)e.OriginalSource).DataContext)
+                    {
+                        grid.SelectedIndex = -1;
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+
+
+        private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (DataGrid.SelectedIndex < 0) return;
-            string connect = (DataGrid.SelectedItem as Cod4BrowseServer).Connect;
+            string connect = (DataGrid.SelectedItem as Cod4BrowseServer)?.Connect;
             Task.Run(() =>
             {
-                var Processes = Process.GetProcesses();
                 Process game = Process.GetProcesses().FirstOrDefault(p => p.ProcessName == "iw3mp");
                 if (game != null)
                 {
@@ -94,7 +113,7 @@ namespace Cod4ServerBrowser
 
         private void OnGetServersCompleted(List<Server> servers)
         {
-            ServerIpCache = servers;
+            _serverIpCache = servers;
             GetStatus(servers);
         }
 
@@ -116,9 +135,10 @@ namespace Cod4ServerBrowser
         private void UdpReceiver()
         {
             _udp = new UdpClient(new IPEndPoint(IPAddress.Any, 28962));
+            // ReSharper disable once RedundantAssignment
+            byte[] data = new byte[805];
             Task.Run(() =>
             {
-                byte[] data = new byte[805];
                 IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
                 try
                 {
@@ -128,9 +148,12 @@ namespace Cod4ServerBrowser
                         {
                             data = _udp.Receive(ref sender);
                             // Console.WriteLine($"Packet #{count++} Received with [{data.Length} bytes] from { sender.Address}");
-                            LogServer(new Source() { IP = sender.Address.ToString(), Port = sender.Port, Status = Encoding.Default.GetString(data) }, _udp.Ttl, true, true);
+                            LogServer(new Source() { IP = sender.Address.ToString(), Port = sender.Port, Status = Encoding.Default.GetString(data) });
                         }
-                        catch (Exception) { }
+                        catch (Exception)
+                        {
+                            // ignored
+                        }
                     }
 
                 }
@@ -138,6 +161,7 @@ namespace Cod4ServerBrowser
             });
         }
 
+        // Need better solution
         public long GetPing(Source server)
         {
             try
@@ -145,12 +169,15 @@ namespace Cod4ServerBrowser
                 PingReply reply = new Ping().Send(server.IP, 5000);
                 if (reply != null) return reply.RoundtripTime;
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
 
             return 1;
         }
 
-        public void LogServer(Source source, short ttl, bool getdvars = true, bool getplayers = true)
+        public void LogServer(Source source, bool getdvars = true, bool getplayers = true)
         {
             Task.Run(() =>
             {
