@@ -1,0 +1,6 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+.vs
+packages
+Cod4ServerBrowser/bin
+Cod4ServerBrowser/obj
