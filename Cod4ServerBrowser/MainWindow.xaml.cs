@@ -71,11 +71,33 @@ namespace Cod4ServerBrowser
             PlayerSearch.SearchBox.TextChanged += (s, e) => SearchHelper.Filter = item => ((Cod4BrowseServer)item).Players.Any(p => p.name.ToLower().Contains(PlayerSearch.SearchBox.Text.ToLower()));
             QuickRefresh.Click += (s, e) => GetStatus(_serverIpCache);
             FullRefresh.Click += (s, e) => RefreshServers();
+            DataGrid.PreviewMouseDown += DataGrid_PreviewMouseDown;
 
             Style rowStyle = new Style(typeof(DataGridRow));
             rowStyle.Setters.Add(new EventSetter(MouseDoubleClickEvent, new MouseButtonEventHandler(Row_DoubleClick)));
-            rowStyle.Setters.Add(new Setter(CursorProperty, Cursors.Hand));
             DataGrid.RowStyle = rowStyle;
+        }
+
+        private void DataGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is DataGrid grid)
+            {
+                FrameworkElement element = e.OriginalSource as FrameworkElement;
+
+                if (element?.DataContext is Cod4BrowseServer)
+                {
+                    if (grid.SelectedItem == (Cod4BrowseServer)((FrameworkElement)e.OriginalSource).DataContext)
+                    {
+                        grid.SelectedIndex = -1;
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+
+        private void DataGrid_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            DataGrid.SelectedIndex = -1;
         }
 
 
@@ -209,7 +231,6 @@ namespace Cod4ServerBrowser
         {
             Console.WriteLine(errormessage);
         }
-
     }
     public static class DictionaryExt
     {

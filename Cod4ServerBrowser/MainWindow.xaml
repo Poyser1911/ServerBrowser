@@ -55,7 +55,7 @@
         <DataGrid x:Name="DataGrid" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" ItemsSource="{Binding Servers, Mode=TwoWay}" AutoGenerateColumns="False" IsReadOnly="True">
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate>
-                    <DataGrid ItemsSource="{Binding Players}" AutoGenerateColumns="False" IsReadOnly="True" Width="{Binding ActualWidth, ElementName=DataGrid}" Padding="40,0,40,0">
+                    <DataGrid ItemsSource="{Binding Players}" AutoGenerateColumns="False" IsReadOnly="True" Width="{Binding ActualWidth, ElementName=DataGrid}" Padding="40,0,40,0" MouseWheel="DataGrid_MouseWheel">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding name}" Width="*"/>
                             <DataGridTextColumn Header="Ping" Binding="{Binding ping}" Width="*"/>
